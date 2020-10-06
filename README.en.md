@@ -6,7 +6,7 @@
 <img alt="GoStack" src=./src/assets/header-bootcamp.png />
 
 <h3 align="center">
-  First project in Node.js
+  Starting app back-end
 </h3>
 
 <p align="center">
