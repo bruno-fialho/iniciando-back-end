@@ -1,6 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
 import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
@@ -20,6 +21,9 @@ class CreateUserService {
 
 		@inject('HashProvider')
 		private hashProvider: IHashProvider,
+
+		@inject('CacheProvider')
+		private cacheProvider: ICacheProvider,
 	) {}
 
 	public async execute({ name, email, password }: IRequest): Promise<User> {
@@ -28,6 +32,7 @@ class CreateUserService {
 		if (checkUserExists) {
 			throw new AppError('Email address already used');
 		}
+
 		const hashedPassword = await this.hashProvider.generateHash(password);
 
 		const user = await this.usersRepository.create({
@@ -35,6 +40,8 @@ class CreateUserService {
 			email,
 			password: hashedPassword,
 		});
+
+		await this.cacheProvider.invalidatePrefix('providers-list');
 
 		return user;
 	}
